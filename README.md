@@ -4,7 +4,7 @@ A Python-based QQ bot for automated homework collection, packaging, and secure r
 
 基于 QQ 机器人的班级作业自动收发系统，支持学生提交作业、管理员打包导出、老师返还文件批量导入、学生按身份查询并领取自己的返还文件。
 注意：本工程仅用于电子科技大学格拉斯哥学院2025级电子信息工程五班的收发作业，纯粹是收作业太（懒）麻（得）烦（收）而开发的。若他人想要使用，记得修改.env文件，并自己附带班级学号名单的CSV文件
-记得还要创立logs,exports,storage三个文件夹，storage有三个下级文件夹，分别是archive，inbox和temp。
+还要创立logs,exports,storage三个文件夹，storage有三个下级文件夹，分别是archive，inbox和temp。
 
 ---
 
