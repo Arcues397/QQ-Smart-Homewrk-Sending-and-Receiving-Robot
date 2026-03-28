@@ -1,0 +1,17 @@
+{
+  "大物实验::实验2": {
+    "category": "大物实验",
+    "task_id": "实验2",
+    "filename_template": "{student_id}+{name}+第二次实验报告.pdf"
+  },
+  "大物预习实验::预习2": {
+    "category": "大物预习实验",
+    "task_id": "预习2",
+    "filename_template": "{student_id}+{name}+第二次实验预习报告.pdf"
+  },
+  "微积分作业::作业3": {
+    "category": "微积分作业",
+    "task_id": "作业3",
+    "filename_template": "{name}_{student_id}_微积分作业3.pdf"
+  }
+}
