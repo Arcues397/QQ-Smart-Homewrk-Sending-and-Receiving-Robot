@@ -1,4 +1,7 @@
+import asyncio
+
 import botpy
+from app.commands import handle_command, help_text
 from botpy import logging
 from botpy.message import C2CMessage
 
@@ -12,14 +15,16 @@ from app.parser import (
 )
 from app.pending import set_pending, get_pending, clear_pending
 from app.archiver import archive_submission
-from app.assignment_config import get_assignment_config
+from app.assignment_config import get_assignment_config, load_assignments
 from app.records import append_submission_record
 from app.student_registry import validate_student
 from app.packer import export_assignment_zip
-from app.bindings import bind_openid, get_binding
+from app.bindings import bind_openid, get_binding, check_binding
 from app.returns import find_return_file
 from app.return_importer import import_return_zip
-from app.file_sender import send_pdf_to_user
+from app.file_sender import send_file_to_user
+#from app.ai_parser import parse_command_by_ai
+# from app.ai_chat import chat_with_deepseek, get_help_text
 
 _log = logging.get_logger()
 
@@ -37,6 +42,7 @@ def is_zip_filename(filename: str) -> bool:
 
 class MyClient(botpy.Client):
     async def on_ready(self):
+        load_assignments()
         _log.info(f"robot 「{self.robot.name}」 on_ready!")
 
     async def on_c2c_message_create(self, message: C2CMessage):
@@ -49,6 +55,9 @@ class MyClient(botpy.Client):
 
         attachments = getattr(message, "attachments", None)
         content = (message.content or "").strip()
+
+        if await handle_command(message, content, openid, is_admin(openid)):
+            return
 
         # 0. 管理员：/打包 <类别> <批次>
         pack_cmd = parse_pack_command(content)
@@ -65,10 +74,12 @@ class MyClient(botpy.Client):
                 return
 
             try:
-                export_path = export_assignment_zip(
+                export_path = await asyncio.to_thread(
+                    export_assignment_zip,
                     category=pack_cmd["category"],
                     task_id=pack_cmd["task_id"]
                 )
+
                 await message._api.post_c2c_message(
                     openid=openid,
                     msg_type=0,
@@ -77,16 +88,21 @@ class MyClient(botpy.Client):
                         f"打包成功。\n"
                         f"作业：{pack_cmd['category']} / {pack_cmd['task_id']}\n"
                         f"压缩包：{export_path.name}\n"
-                        f"位置：{export_path}"
+                        f"正在发送文件……"
                     )
                 )
-                print(f"已生成压缩包：{export_path}")
+
+                await send_file_to_user(message, export_path)
+
+                print(f"已生成并发送压缩包：{export_path}")
+
             except Exception as e:
                 print(f"打包失败: {e}")
                 await message._api.post_c2c_message(
                     openid=openid,
                     msg_type=0,
                     msg_id=message.id,
+                    msg_seq=3,
                     content=f"打包失败：{e}"
                 )
 
@@ -107,6 +123,10 @@ class MyClient(botpy.Client):
                 print("========== 单聊结束 ==========\n")
                 return
 
+            if not get_assignment_config(**import_return_cmd):
+                await message._api.post_c2c_message(openid=openid, msg_type=0, msg_id=message.id,
+                                                    content="未找到该作业批次。")
+                return
             IMPORT_RETURN_PENDING[openid] = import_return_cmd
 
             await message._api.post_c2c_message(
@@ -175,7 +195,7 @@ class MyClient(botpy.Client):
                     )
                 )
 
-                await send_pdf_to_user(message, saved_path)
+                await send_file_to_user(message, saved_path)
 
                 print(f"已回传返还文件：{saved_path}")
 
@@ -185,7 +205,8 @@ class MyClient(botpy.Client):
                     openid=openid,
                     msg_type=0,
                     msg_id=message.id,
-                    content=f"找到文件了，但发送失败：{e}"
+                    msg_seq=3,
+                    content="返还文件发送失败，请稍后重试。"
                 )
 
             print("========== 单聊结束 ==========\n")
@@ -215,30 +236,14 @@ class MyClient(botpy.Client):
             )
 
             if not student_check["ok"]:
-                if student_check["reason"] == "student_id_not_found":
-                    await message._api.post_c2c_message(
-                        openid=openid,
-                        msg_type=0,
-                        msg_id=message.id,
-                        content=(
-                            f"学号校验失败：未找到学号 {parsed['student_id']}。\n"
-                            f"请检查后重新发送。"
-                        )
-                    )
-                elif student_check["reason"] == "name_mismatch":
-                    await message._api.post_c2c_message(
-                        openid=openid,
-                        msg_type=0,
-                        msg_id=message.id,
-                        content=(
-                            f"姓名与学号不匹配。\n"
-                            f"学号 {parsed['student_id']} 对应姓名应为：{student_check['expected_name']}\n"
-                            f"请检查后重新发送。"
-                        )
-                    )
+                await message._api.post_c2c_message(openid=openid, msg_type=0, msg_id=message.id,
+                                                    content="请核对学号和姓名后重新提交。")
+                return
 
-                print("学号姓名校验失败")
-                print("========== 单聊结束 ==========\n")
+            try:
+                check_binding(openid, parsed["student_id"])
+            except ValueError as exc:
+                await message._api.post_c2c_message(openid=openid, msg_type=0, msg_id=message.id, content=str(exc))
                 return
 
             set_pending(openid, parsed)
@@ -298,6 +303,9 @@ class MyClient(botpy.Client):
                         f"未匹配：{result['unmatched_count']} 个"
                     )
 
+                    if result["review_count"]:
+                        reply_text += (f"\n重名待确认：{result['review_count']} 个。"
+                                       f"\n/待确认 {pending_import['category']} {pending_import['task_id']}")
                     if result["unmatched_files"]:
                         preview = "、".join(result["unmatched_files"][:5])
                         reply_text += f"\n未匹配示例：{preview}"
@@ -375,6 +383,14 @@ class MyClient(botpy.Client):
                     print("========== 单聊结束 ==========\n")
                     return
 
+                try:
+                    if get_pending(openid) is not pending:
+                        raise ValueError("提交信息已变更或过期，请重新提交。")
+                    check_binding(openid, pending["student_id"])
+                except ValueError:
+                    save_path.unlink(missing_ok=True)
+                    raise
+
                 archive_result = archive_submission(
                     downloaded_file=save_path,
                     category=pending["category"],
@@ -446,17 +462,26 @@ class MyClient(botpy.Client):
             openid=openid,
             msg_type=0,
             msg_id=message.id,
-            content=(
-                "未识别到有效操作。\n"
-                "学生提交：提交 <类别> <批次> <学号> <姓名>\n"
-                "学生查询：查询 <类别> <批次>\n"
-                "管理员打包：/打包 <类别> <批次>\n"
-                "管理员导入返还：/导入返还 <类别> <批次>"
-            )
+            content=help_text(is_admin(openid))
         )
 
         print("普通消息，未处理")
         print("========== 单聊结束 ==========\n")
+    # # 5. 普通消息：临时接入 DeepSeek 聊天
+    #     reply_text = await chat_with_deepseek(
+    #         user_id=openid,
+    #         user_text=content,
+    #     )
+
+    #     await message._api.post_c2c_message(
+    #         openid=openid,
+    #         msg_type=0,
+    #         msg_id=message.id,
+    #         content=reply_text
+    #     )
+
+    #     print("普通消息，已进入 AI 聊天或默认帮助")
+    #     print("========== 单聊结束 ==========\n")
 
 
 def run_bot():

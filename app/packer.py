@@ -1,83 +1,55 @@
-import csv
-import zipfile
-from pathlib import Path
-from datetime import datetime
 import re
+from pathlib import Path
+from tempfile import mkdtemp
+from zipfile import ZIP_DEFLATED, ZipFile
 
-from app.config import ARCHIVE_DIR, EXPORT_DIR, DATA_DIR
+from app.archiver import sanitize_name
+from app.config import ARCHIVE_DIR, EXPORT_DIR
+from app.reports import load_latest_submissions
+from app.rosters import expected_students
 
 
-SUBMISSIONS_FILE = DATA_DIR / "submissions.csv"
-
-
-def sanitize_name(text: str) -> str:
-    return re.sub(r'[\\/:*?"<>|]', "_", text.strip())
-
-
-def build_export_name(category: str, task_id: str) -> str:
-    category = sanitize_name(category)
-    task_id = sanitize_name(task_id)
-    ts = datetime.now().strftime("%Y%m%d_%H%M%S")
-    return f"{category}_{task_id}_{ts}.zip"
+def assignment_title(task_id: str) -> str:
+    match = re.fullmatch(r"(作业|实验|预习)(\d+)", task_id)
+    if match:
+        kind, number = match.groups()
+        label = {"作业": "作业", "实验": "实验报告", "预习": "实验预习报告"}[kind]
+        return f"第{number}次{label}"
+    return sanitize_name(task_id)
 
 
 def export_assignment_zip(category: str, task_id: str) -> Path:
-    """
-    打包：
-    storage/archive/<类别>/<批次>/
-    """
-    category_safe = sanitize_name(category)
-    task_id_safe = sanitize_name(task_id)
+    latest = load_latest_submissions(category, task_id)
+    if not latest:
+        raise ValueError("这个作业批次还没有提交记录。")
 
-    assignment_dir = ARCHIVE_DIR / category_safe / task_id_safe
-    if not assignment_dir.exists():
-        raise FileNotFoundError(f"未找到作业目录：{assignment_dir}")
+    valid_dir = ARCHIVE_DIR / sanitize_name(category) / sanitize_name(task_id) / "valid"
+    files = []
+    seen = set()
+    for student_id, record in sorted(latest.items()):
+        name = record["saved_filename"]
+        if not name or Path(name).name != name or not name.lower().endswith(".pdf"):
+            raise ValueError(f"学号 {student_id} 的归档文件名异常，请核对。")
+        if name.casefold() in seen:
+            raise ValueError("有不同学号对应同一份 PDF，请核对后再打包。")
+        path = valid_dir / name
+        if not path.is_file():
+            raise FileNotFoundError(f"学号 {student_id} 的最新归档文件缺失。")
+        seen.add(name.casefold())
+        files.append(path)
 
-    export_name = build_export_name(category_safe, task_id_safe)
-    export_path = EXPORT_DIR / export_name
-
-    filtered_csv_path = EXPORT_DIR / f"_{category_safe}_{task_id_safe}_submissions_tmp.csv"
+    count, expected = len(files), len(expected_students(category, task_id))
+    title = assignment_title(task_id)
+    filename = f"格拉斯哥学院-电工五班-{title}-实交-{count}份（应交{expected}份）.zip"
+    # 同一批次可反复导出，每次发送使用独立的文件。
+    directory = Path(mkdtemp(prefix="pack-", dir=EXPORT_DIR))
+    output = directory / filename
     try:
-        write_filtered_submissions_csv(
-            category=category,
-            task_id=task_id,
-            output_csv=filtered_csv_path
-        )
-
-        with zipfile.ZipFile(export_path, "w", zipfile.ZIP_DEFLATED) as zf:
-            for file_path in assignment_dir.rglob("*"):
-                if file_path.is_file():
-                    arcname = Path(category_safe) / task_id_safe / file_path.relative_to(assignment_dir)
-                    zf.write(file_path, arcname=str(arcname))
-
-            if filtered_csv_path.exists():
-                zf.write(
-                    filtered_csv_path,
-                    arcname=str(Path(category_safe) / task_id_safe / "reports" / "submissions.csv")
-                )
-
-    finally:
-        if filtered_csv_path.exists():
-            filtered_csv_path.unlink(missing_ok=True)
-
-    return export_path
-
-
-def write_filtered_submissions_csv(category: str, task_id: str, output_csv: Path):
-    if not SUBMISSIONS_FILE.exists():
-        return
-
-    with open(SUBMISSIONS_FILE, "r", newline="", encoding="utf-8-sig") as f:
-        reader = csv.DictReader(f)
-        rows = [
-            row for row in reader
-            if row.get("category") == category and row.get("task_id") == task_id
-        ]
-
-    if not rows:
-        return
-
-    with open(output_csv, "w", newline="", encoding="utf-8-sig") as f:
-        writer = csv.DictWriter(f, fieldnames=reader.fieldnames)
-        writer.writeheader()
-        writer.writerows(rows)
+        with ZipFile(output, "x", ZIP_DEFLATED, compresslevel=1) as archive:
+            for path in files:
+                archive.write(path, arcname=path.name)
+    except BaseException:
+        output.unlink(missing_ok=True)
+        directory.rmdir()
+        raise
+    return output

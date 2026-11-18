@@ -7,8 +7,13 @@ from app.config import BASE_DIR
 STUDENT_XLSX = BASE_DIR / "25电工五班学号对照(2).xlsx"
 
 
-@lru_cache(maxsize=1)
 def load_students() -> dict[str, str]:
+    stat = STUDENT_XLSX.stat()
+    return _read_students((stat.st_ino, stat.st_mtime_ns, stat.st_size))
+
+
+@lru_cache(maxsize=1)
+def _read_students(version) -> dict[str, str]:
     wb = openpyxl.load_workbook(STUDENT_XLSX, data_only=True)
     ws = wb["Sheet1"]
 
@@ -29,6 +34,7 @@ def load_students() -> dict[str, str]:
         if sid and sname:
             students[sid] = sname
 
+    wb.close()
     return students
 
 

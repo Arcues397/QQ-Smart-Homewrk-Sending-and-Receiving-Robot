@@ -3,7 +3,7 @@ import re
 from datetime import datetime
 
 from app.config import DATA_DIR, EXPORT_DIR
-from app.student_registry import load_students
+from app.rosters import expected_students
 
 
 SUBMISSIONS_FILE = DATA_DIR / "submissions.csv"
@@ -35,7 +35,7 @@ def load_latest_submissions(category: str, task_id: str) -> dict[str, dict]:
 def generate_submitted_report(category: str, task_id: str):
     latest = load_latest_submissions(category, task_id)
 
-    ts = datetime.now().strftime("%Y%m%d_%H%M%S")
+    ts = datetime.now().strftime("%Y%m%d_%H%M%S_%f")
     filename = f"已交_{sanitize_name(category)}_{sanitize_name(task_id)}_{ts}.csv"
     output_path = EXPORT_DIR / filename
 
@@ -72,11 +72,11 @@ def generate_submitted_report(category: str, task_id: str):
 
 
 def generate_missing_report(category: str, task_id: str):
-    students = load_students()
+    students = expected_students(category, task_id)
     latest = load_latest_submissions(category, task_id)
     submitted_ids = set(latest.keys())
 
-    ts = datetime.now().strftime("%Y%m%d_%H%M%S")
+    ts = datetime.now().strftime("%Y%m%d_%H%M%S_%f")
     filename = f"缺交_{sanitize_name(category)}_{sanitize_name(task_id)}_{ts}.csv"
     output_path = EXPORT_DIR / filename
 

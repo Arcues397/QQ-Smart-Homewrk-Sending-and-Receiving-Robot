@@ -10,6 +10,11 @@ APPID = os.getenv("BOT_APPID", "").strip()
 APPSECRET = os.getenv("BOT_APPSECRET", "").strip()
 USE_SANDBOX = os.getenv("BOT_USE_SANDBOX", "true").lower() == "true"
 ADMIN_OPENID = os.getenv("ADMIN_OPENID", "").strip()
+DEEPSEEK_API_KEY = os.getenv("DEEPSEEK_API_KEY", "").strip()
+DEEPSEEK_CHAT_MODEL = os.getenv("DEEPSEEK_CHAT_MODEL", "deepseek-v4-pro").strip()
+DEEPSEEK_PARSE_MODEL = os.getenv("DEEPSEEK_PARSE_MODEL", "deepseek-v4-flash").strip()
+ENABLE_AI_CHAT = os.getenv("ENABLE_AI_CHAT", "true").lower() == "true"
+ENABLE_AI_PARSE = os.getenv("ENABLE_AI_PARSE", "true").lower() == "true"
 
 DATA_DIR = BASE_DIR / "data"
 STORAGE_DIR = BASE_DIR / "storage"

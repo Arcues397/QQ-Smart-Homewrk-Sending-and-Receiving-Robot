@@ -2,16 +2,217 @@
   "大物实验::实验2": {
     "category": "大物实验",
     "task_id": "实验2",
-    "filename_template": "{student_id}+{name}+第二次实验报告.pdf"
+    "filename_template": "大学物理实验1+EEE+{student_id}{name}+第二次实验报告.pdf"
   },
   "大物预习实验::预习2": {
     "category": "大物预习实验",
     "task_id": "预习2",
-    "filename_template": "{student_id}+{name}+第二次实验预习报告.pdf"
+    "filename_template": "大学物理实验1+EEE+{student_id}{name}+第二次实验预习报告.pdf"
   },
   "微积分作业::作业3": {
     "category": "微积分作业",
     "task_id": "作业3",
-    "filename_template": "{name}_{student_id}_微积分作业3.pdf"
+    "filename_template": "微积分II+EEE+{student_id}{name}+第三次作业.pdf"
+  },
+  "微积分作业::作业4": {
+    "category": "微积分作业",
+    "task_id": "作业4",
+    "filename_template": "微积分II+EEE+{student_id}{name}+第四次作业.pdf"
+  },
+  "大物实验::实验3": {
+    "category": "大物实验",
+    "task_id": "实验3",
+    "filename_template": "大学物理实验1+EEE+{student_id}{name}+第三次实验报告.pdf"
+  },
+  "大物预习实验::预习4": {
+    "category": "大物预习实验",
+    "task_id": "预习4",
+    "filename_template": "大学物理实验1+EEE+{student_id}{name}+第四次实验预习报告.pdf"
+  },
+  "大物实验::实验4": {
+    "category": "大物实验",
+    "task_id": "实验4",
+    "filename_template": "大学物理实验1+EEE+{student_id}{name}+第四次实验报告.pdf"
+  },
+  "微积分作业::作业5": {
+    "category": "微积分作业",
+    "task_id": "作业5",
+    "filename_template": "微积分II+EEE+{student_id}{name}+第五次作业.pdf"
+  },
+  "大物预习实验::预习5": {
+    "category": "大物预习实验",
+    "task_id": "预习5",
+    "filename_template": "大学物理实验1+EEE+{student_id}{name}+第五次实验预习报告.pdf"
+  },
+  "大物实验::实验5": {
+    "category": "大物实验",
+    "task_id": "实验5",
+    "filename_template": "大学物理实验1+EEE+{student_id}{name}+第五次实验报告.pdf"
+  },
+  "微积分作业::作业6": {
+    "category": "微积分作业",
+    "task_id": "作业6",
+    "filename_template": "微积分II+EEE+{student_id}{name}+第六次作业.pdf"
+  },
+  "微积分作业::作业7": {
+    "category": "微积分作业",
+    "task_id": "作业7",
+    "filename_template": "微积分II+EEE+{student_id}{name}+第七次作业.pdf"
+  },
+  "微积分作业::作业8": {
+    "category": "微积分作业",
+    "task_id": "作业8",
+    "filename_template": "微积分II+EEE+{student_id}{name}+第八次作业.pdf"
+  },
+  "微积分作业::作业9": {
+    "category": "微积分作业",
+    "task_id": "作业9",
+    "filename_template": "微积分II+EEE+{student_id}{name}+第九次作业.pdf"
+  },
+  "微积分作业::作业10": {
+    "category": "微积分作业",
+    "task_id": "作业10",
+    "filename_template": "微积分II+EEE+{student_id}{name}+第十次作业.pdf"
+  },
+  "概率论作业::作业1": {
+    "category": "概率论作业",
+    "task_id": "作业1",
+    "filename_template": "概率论与数理统计+EEE+{student_id}{name}+第1次作业.pdf"
+  },
+  "概率论作业::作业2": {
+    "category": "概率论作业",
+    "task_id": "作业2",
+    "filename_template": "概率论与数理统计+EEE+{student_id}{name}+第2次作业.pdf"
+  },
+  "概率论作业::作业3": {
+    "category": "概率论作业",
+    "task_id": "作业3",
+    "filename_template": "概率论与数理统计+EEE+{student_id}{name}+第3次作业.pdf"
+  },
+  "概率论作业::作业4": {
+    "category": "概率论作业",
+    "task_id": "作业4",
+    "filename_template": "概率论与数理统计+EEE+{student_id}{name}+第4次作业.pdf"
+  },
+  "概率论作业::作业5": {
+    "category": "概率论作业",
+    "task_id": "作业5",
+    "filename_template": "概率论与数理统计+EEE+{student_id}{name}+第5次作业.pdf"
+  },
+  "概率论作业::作业6": {
+    "category": "概率论作业",
+    "task_id": "作业6",
+    "filename_template": "概率论与数理统计+EEE+{student_id}{name}+第6次作业.pdf"
+  },
+  "概率论作业::作业7": {
+    "category": "概率论作业",
+    "task_id": "作业7",
+    "filename_template": "概率论与数理统计+EEE+{student_id}{name}+第7次作业.pdf"
+  },
+  "概率论作业::作业8": {
+    "category": "概率论作业",
+    "task_id": "作业8",
+    "filename_template": "概率论与数理统计+EEE+{student_id}{name}+第8次作业.pdf"
+  },
+  "概率论作业::作业9": {
+    "category": "概率论作业",
+    "task_id": "作业9",
+    "filename_template": "概率论与数理统计+EEE+{student_id}{name}+第9次作业.pdf"
+  },
+  "概率论作业::作业10": {
+    "category": "概率论作业",
+    "task_id": "作业10",
+    "filename_template": "概率论与数理统计+EEE+{student_id}{name}+第10次作业.pdf"
+  },
+  "概率论作业::作业11": {
+    "category": "概率论作业",
+    "task_id": "作业11",
+    "filename_template": "概率论与数理统计+EEE+{student_id}{name}+第11次作业.pdf"
+  },
+  "概率论作业::作业12": {
+    "category": "概率论作业",
+    "task_id": "作业12",
+    "filename_template": "概率论与数理统计+EEE+{student_id}{name}+第12次作业.pdf"
+  },
+  "概率论作业::作业13": {
+    "category": "概率论作业",
+    "task_id": "作业13",
+    "filename_template": "概率论与数理统计+EEE+{student_id}{name}+第13次作业.pdf"
+  },
+  "概率论作业::作业14": {
+    "category": "概率论作业",
+    "task_id": "作业14",
+    "filename_template": "概率论与数理统计+EEE+{student_id}{name}+第14次作业.pdf"
+  },
+  "概率论作业::作业15": {
+    "category": "概率论作业",
+    "task_id": "作业15",
+    "filename_template": "概率论与数理统计+EEE+{student_id}{name}+第15次作业.pdf"
+  },
+  "概率论作业::作业16": {
+    "category": "概率论作业",
+    "task_id": "作业16",
+    "filename_template": "概率论与数理统计+EEE+{student_id}{name}+第16次作业.pdf"
+  },
+  "大物实验2::实验2": {
+    "category": "大物实验",
+    "task_id": "实验2",
+    "filename_template": "大学物理实验2+EEE+{student_id}{name}+第二次实验报告.pdf"
+  },
+  "大物预习实验2::预习2": {
+    "category": "大物预习实验",
+    "task_id": "预习2",
+    "filename_template": "大学物理实验2+EEE+{student_id}{name}+第二次实验预习报告.pdf"
+  },
+  "大物实验2::实验3": {
+    "category": "大物实验",
+    "task_id": "实验3",
+    "filename_template": "大学物理实验2+EEE+{student_id}{name}+第三次实验报告.pdf"
+  },
+  "大物预习实验2::预习4": {
+    "category": "大物预习实验",
+    "task_id": "预习4",
+    "filename_template": "大学物理实验2+EEE+{student_id}{name}+第四次实验预习报告.pdf"
+  },
+  "大物实验2::实验4": {
+    "category": "大物实验",
+    "task_id": "实验4",
+    "filename_template": "大学物理实验2+EEE+{student_id}{name}+第四次实验报告.pdf"
+  },
+  "大物预习实验2::预习5": {
+    "category": "大物预习实验",
+    "task_id": "预习5",
+    "filename_template": "大学物理实验2+EEE+{student_id}{name}+第五次实验预习报告.pdf"
+  },
+  "大物实验2::实验5": {
+    "category": "大物实验",
+    "task_id": "实验5",
+    "filename_template": "大学物理实验2+EEE+{student_id}{name}+第五次实验报告.pdf"
+  },
+  "大物预习实验2::预习1": {
+    "category": "大物预习实验",
+    "task_id": "预习1",
+    "filename_template": "大学物理实验2+EEE+{student_id}{name}+第一次实验预习报告.pdf"
+  },
+  "大物实验2::实验1": {
+    "category": "大物实验",
+    "task_id": "实验1",
+    "filename_template": "大学物理实验2+EEE+{student_id}{name}+第一次实验报告.pdf"
+  },
+  "大物预习实验2::预习6": {
+    "category": "大物预习实验",
+    "task_id": "预习6",
+    "filename_template": "大学物理实验2+EEE+{student_id}{name}+第六次实验预习报告.pdf"
+  },
+  "大物实验2::实验6": {
+    "category": "大物实验",
+    "task_id": "实验6",
+    "filename_template": "大学物理实验2+EEE+{student_id}{name}+第六次实验报告.pdf"
+  },
+  "大物预习实验2::预习3": {
+    "category": "大物预习实验",
+    "task_id": "预习3",
+    "filename_template": "大学物理实验2+EEE+{student_id}{name}+第三次实验预习报告.pdf"
   }
+
 }
